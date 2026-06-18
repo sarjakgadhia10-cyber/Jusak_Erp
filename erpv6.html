@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jusak Foods ERP</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; margin: 0; background: #FFF2D9; color: #000000; }
+    .header { background: #DF1C3A; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .nav { background: #DF1C3A; padding: 0 24px; }
+    .nav button { background: none; border: none; color: white; padding: 14px 20px; cursor: pointer; font-size: 15px; font-weight: 500; }
+    .nav button:hover, .nav button.active { background: #b91c1c; }
+    .tab-content { display: none; padding: 30px; }
+    .tab-content.active { display: block; }
+    .login-box { max-width: 420px; margin: 80px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .login-box input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; }
+    .login-box button { width: 100%; padding: 14px; background: #DF1C3A; color: white; border: none; border-radius: 6px; font-weight: 600; }
+    form { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 25px; }
+    label { display: block; margin-top: 14px; font-weight: 600; font-size: 14px; }
+    input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; }
+    button { margin-top: 18px; padding: 12px 20px; background: #DF1C3A; color: white; border: none; border-radius: 6px; font-weight: 600; }
+    .result { margin-top: 12px; color: #166534; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #DF1C3A; color: white; }
+    .btn-add { background: #0f766e; color: white; border: none; padding: 8px 14px; border-radius: 5px; }
+    .btn-remove { background: #b91c1c; color: white; border: none; padding: 5px 10px; border-radius: 5px; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; }
+    .card { background: white; padding: 22px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+    .card h3 { margin: 0 0 8px 0; font-size: 15px; color: #555; }
+    .card p { margin: 0; font-size: 26px; font-weight: 700; color: #DF1C3A; }
+  </style>
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <h2 style="text-align:center; color:#DF1C3A; margin-bottom:25px;">Jusak Foods ERP</h2>
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button onclick="login()">Login</button>
+      <p id="loginError" style="color:red; text-align:center; margin-top:10px;"></p>
+    </div>
+  </div>
+
+  <!-- Main ERP -->
+  <div id="mainScreen" style="display:none;">
+    <div class="header">
+      <h1>Jusak Foods ERP</h1>
+      <div>
+        <span id="userInfo"></span>
+        <button onclick="logout()" style="background:#b91c1c; color:white; border:none; padding:8px 16px; border-radius:5px; cursor:pointer; margin-left:15px;">Logout</button>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <button class="tab-btn" onclick="showTab('dashboard')">Dashboard</button>
+      <button class="tab-btn" onclick="showTab('production')">Daily Production</button>
+      <button class="tab-btn" onclick="showTab('rmIn')">RM IN</button>
+      <button class="tab-btn" onclick="showTab('qc')">QC</button>
+      <button class="tab-btn" onclick="showTab('finishedGoods')">Finished Goods</button>
+      <button class="tab-btn" onclick="showTab('dispatch')">Dispatch</button>
+      <button class="tab-btn" onclick="showTab('sales')">Sales Sheet</button>
+      <button class="tab-btn" onclick="showTab('transport')">Transport</button>
+      <button class="tab-btn" onclick="showTab('suppliers')">Supplier List</button>
+      <button class="tab-btn" onclick="showTab('customers')">Customers List</button>
+      <button class="tab-btn" onclick="showTab('expense')">Daily Expense</button>
+      <button class="tab-btn" onclick="showTab('payments')">Payment</button>
+      <button class="tab-btn" onclick="showTab('consumption')">Production Consumption</button>
+      <button class="tab-btn" onclick="showTab('reports')">Reports</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="tab-content">
+      <h2>Dashboard</h2>
+      <div class="dashboard-grid">
+        <div class="card"><h3>Monthly Sales</h3><p id="monthlySales">0</p></div>
+        <div class="card"><h3>Monthly Purchase</h3><p id="monthlyPurchase">0</p></div>
+        <div class="card"><h3>Monthly Expense</h3><p id="monthlyExpense">0</p></div>
+        <div class="card"><h3>Total Receivables</h3><p id="totalReceivables">0</p></div>
+        <div class="card"><h3>Total Payables</h3><p id="totalPayables">0</p></div>
+        <div class="card"><h3>Productions Today</h3><p id="productionsToday">0</p></div>
+        <div class="card"><h3>Expense Today</h3><p id="expenseToday">0</p></div>
+      </div>
+    </div>
+
+    <!-- Daily Production -->
+    <div id="production" class="tab-content">
+      <h2>Daily Production</h2>
+      <form id="productionForm">
+        <label>Date: <input type="date" id="prod_date" required></label>
+        <label>Batch Number: <input type="text" id="batch_number" required></label>
+        <label>Product Name: <input type="text" id="product_name" required></label>
+        <label>KG/ Pcs: <input type="text" id="kg_/_pcs"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="prodResult"></div>
+      </form>
+    </div>
+
+    <!-- RM IN -->
+    <div id="rmIn" class="tab-content">
+      <h2>RM IN</h2>
+      <form id="rmInForm">
+        <label>Purchase Date: <input type="date" name="purchase_date" required></label>
+        <label>Bill Number: <input type="text" name="bill_number" required></label>
+        <label>Supplier Name: <input type="text" name="supplier_name" required></label>
+        <h3>Products Purchased</h3>
+        <table id="rmInTable"><thead><tr><th>Product Name</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr></thead><tbody id="rmInTableBody"></tbody></table>
+        <button type="button" class="btn-add" onclick="addRMInRow()">+ Add Product</button>
+        <button type="submit">Save RM IN</button>
+        <div class="result" id="rmInResult"></div>
+      </form>
+    </div>
+
+    <!-- QC -->
+    <div id="qc" class="tab-content">
+      <h2>Quality Control</h2>
+      <form id="qcForm">
+        <label>Date: <input type="date" name="date"></label>
+        <label>Batch Number: <input type="text" name="batch_number"></label>
+        <label>Product Name: <input type="text" name="product_name"></label>
+        <label>Temp Check: <input type="text" name="temp_check"></label>
+        <label>Weight Check: <input type="text" name="weight_check"></label>
+        <label>Sensory Check: <input type="text" name="sensory_check"></label>
+        <label>Status: <select name="status"><option>Pass</option><option>Hold</option><option>Reject</option></select></label>
+        <label>Remarks: <input type="text" name="remarks"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="qcResult"></div>
+      </form>
+    </div>
+
+    <!-- Finished Goods -->
+    <div id="finishedGoods" class="tab-content">
+      <h2>Finished Goods</h2>
+      <form id="finishedGoodsForm">
+        <label>Product Name: <input type="text" name="product_name"></label>
+        <label>Batch Number: <input type="text" name="batch_number"></label>
+        <label>Mfg Date: <input type="date" name="mfg_date"></label>
+        <label>Expiry Date: <input type="date" name="expiry_date"></label>
+        <label>In Stock: <input type="number" step="0.01" name="in_stock"></label>
+        <label>Unit: <input type="text" name="unit"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="finishedGoodsResult"></div>
+      </form>
+    </div>
+
+    <!-- Dispatch -->
+    <div id="dispatch" class="tab-content">
+      <h2>Dispatch</h2>
+      <form id="dispatchForm">
+        <label>Date: <input type="date" name="date"></label>
+        <label>Invoice No: <input type="text" name="invoice_no"></label>
+        <label>Customer Name: <input type="text" name="customer_name"></label>
+        <label>Transport Name: <input type="text" name="transport_name"></label>
+        <h3>Products</h3>
+        <table id="dispatchTable"><thead><tr><th>Product</th><th>Batch</th><th>Qty</th><th>Rate</th><th>Total</th><th>Action</th></tr></thead><tbody id="dispatchTableBody"></tbody></table>
+        <button type="button" class="btn-add" onclick="addDispatchRow()">+ Add Product</button>
+        <button type="submit">Save</button>
+        <div class="result" id="dispatchResult"></div>
+      </form>
+    </div>
+
+    <!-- Sales Sheet -->
+    <div id="sales" class="tab-content">
+      <h2>Sales Sheet</h2>
+      <form id="salesForm">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+          <label>Date: <input type="date" name="date"></label>
+          <label>Client Name: <input type="text" name="client_name"></label>
+          <label>Product: <input type="text" name="product"></label>
+          <label>Price: <input type="number" step="0.01" name="price"></label>
+          <label>Quantity: <input type="number" step="0.01" name="quantity"></label>
+          <label>Amount: <input type="number" step="0.01" name="amount" readonly></label>
+          <label>Dispatch Date: <input type="date" name="dispatch_date"></label>
+          <label>Order Person: <input type="text" name="order_person"></label>
+          <label>Dispatch Person: <input type="text" name="dispatch_person"></label>
+          <label>Mode of Payment: <input type="text" name="mode"></label>
+          <label>Date of Payment: <input type="date" name="payment_date"></label>
+          <label>Paid/Unpaid: <select name="status"><option>Paid</option><option>Unpaid</option></select></label>
+          <label>Collected by: <input type="text" name="collected_by"></label>
+          <label>Remarks: <input type="text" name="remarks"></label>
+        </div>
+        <button type="submit">Save</button>
+        <div class="result" id="salesResult"></div>
+      </form>
+    </div>
+
+    <!-- Transport -->
+    <div id="transport" class="tab-content">
+      <h2>Transport</h2>
+      <form id="transportForm">
+        <label>Date: <input type="date" name="date"></label>
+        <label>Invoice No: <input type="text" name="invoice_no"></label>
+        <label>Customer Name: <input type="text" name="customer_name"></label>
+        <label>Transport Name: <input type="text" name="transport_name"></label>
+        <label>Amount of Boxes: <input type="number" name="amount_of_boxes"></label>
+        <label>Rate Per Box: <input type="number" step="0.01" name="rate_per_box"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="transportResult"></div>
+      </form>
+    </div>
+
+    <!-- Supplier List -->
+    <div id="suppliers" class="tab-content">
+      <h2>Supplier List</h2>
+      <form id="supplierForm">
+        <label>Company Name: <input type="text" name="company_name"></label>
+        <label>Contact Person: <input type="text" name="contact_person"></label>
+        <label>Phone: <input type="text" name="phone"></label>
+        <label>Email: <input type="text" name="email"></label>
+        <label>GST No: <input type="text" name="gst_no"></label>
+        <label>Address: <input type="text" name="address"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="supplierResult"></div>
+      </form>
+    </div>
+
+    <!-- Customers List -->
+    <div id="customers" class="tab-content">
+      <h2>Customers List</h2>
+      <form id="customerForm">
+        <label>Customer Name: <input type="text" name="customer_name"></label>
+        <label>Contact Person: <input type="text" name="contact_person"></label>
+        <label>Phone: <input type="text" name="phone"></label>
+        <label>Email: <input type="text" name="email"></label>
+        <label>GST No: <input type="text" name="gst_no"></label>
+        <label>Delivery Address: <input type="text" name="delivery_address"></label>
+        <label>Credit: <input type="number" step="0.01" name="credit"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="customerResult"></div>
+      </form>
+    </div>
+
+    <!-- Daily Expense -->
+    <div id="expense" class="tab-content">
+      <h2>Daily Expense</h2>
+      <form id="expenseForm">
+        <label>Date: <input type="date" name="date"></label>
+        <label>Category: <input type="text" name="category"></label>
+        <label>Description: <input type="text" name="description"></label>
+        <label>Amount: <input type="number" step="0.01" name="amount"></label>
+        <label>Paid By: <input type="text" name="paid_by"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="expenseResult"></div>
+      </form>
+    </div>
+
+    <!-- Payment -->
+    <div id="payments" class="tab-content">
+      <h2>Payment</h2>
+      <form id="paymentForm">
+        <label>Date: <input type="date" name="date"></label>
+        <label>Party Name: <input type="text" name="party_name"></label>
+        <label>Type: <select name="type"><option>Paid</option><option>Received</option></select></label>
+        <label>Mode: <select name="mode"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option></select></label>
+        <label>Amount: <input type="number" step="0.01" name="amount"></label>
+        <label>Ref No: <input type="text" name="ref_no"></label>
+        <label>Balance: <input type="number" step="0.01" name="balance"></label>
+        <button type="submit">Save</button>
+        <div class="result" id="paymentResult"></div>
+      </form>
+    </div>
+
+    <!-- Production Consumption -->
+    <div id="consumption" class="tab-content">
+      <h2>Production Consumption</h2>
+      <form id="consumptionForm">
+        <label>Batch Number: <input type="text" name="batch_number"></label>
+        <label>Product Name: <input type="text" name="product_name"></label>
+        <h3>Raw Materials</h3>
+        <table id="consumptionTable"><thead><tr><th>Raw Material</th><th>Qty Used</th><th>Unit</th><th>Action</th></tr></thead><tbody id="consumptionTableBody"></tbody></table>
+        <button type="button" class="btn-add" onclick="addConsumptionRow()">+ Add Raw Material</button>
+        <button type="submit">Save</button>
+        <div class="result" id="consumptionResult"></div>
+      </form>
+    </div>
+
+    <!-- Reports -->
+    <div id="reports" class="tab-content">
+      <h2>Search Records</h2>
+      <input type="text" id="searchInput" placeholder="Enter Batch Number or Product Name" style="width: 300px; padding: 10px;">
+      <button onclick="searchRecords()">Search</button>
+      <div id="searchResult" style="margin-top: 20px;"></div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0YQo847_WlwcHaictDLOM9DCd6XV0AuPex6H1SK9G-jMZTIbHQ3sikxpnGmwsk8nv/exec";
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("loginError");
+
+      if ((username === "Sarjak" || username === "Kartik") && password === "1112") {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainScreen").style.display = "block";
+        document.getElementById("userInfo").innerText = `Logged in as: ${username} (Admin)`;
+        loadDashboard();
+      } 
+      else if (username === "Gorwa" || username === "Ajwa") {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainScreen").style.display = "block";
+        document.getElementById("userInfo").innerText = `Logged in as: ${username}`;
+        document.getElementById("dashboard").style.display = "none";
+      } 
+      else {
+        errorMsg.innerText = "Invalid username or password";
+      }
+    }
+
+    function logout() {
+      location.reload();
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Auto-fill today's date
+    function setTodayDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.querySelectorAll('input[type="date"]').forEach(input => {
+        if (!input.value) input.value = today;
+      });
+    }
+
+    window.onload = function() {
+      setTodayDate();
+    };
+
+    // Dashboard
+    async function loadDashboard() {
+      try {
+        const dispatchData = await fetchSheet("Dispatch");
+        const rmInData = await fetchSheet("RM IN");
+        const expenseData = await fetchSheet("Daily Expense");
+        const productionData = await fetchSheet("Daily Production");
+
+        const today = new Date().toISOString().split("T")[0];
+        const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
+
+        const monthlySales = dispatchData.filter(r => r[0] >= monthStart && r[0] <= today).reduce((sum, r) => sum + (parseFloat(r[7]) || 0), 0);
+        document.getElementById("monthlySales").innerText = monthlySales.toFixed(2);
+
+        const monthlyPurchase = rmInData.filter(r => r[0] >= monthStart && r[0] <= today).reduce((sum, r) => sum + (parseFloat(r[6]) || 0), 0);
+        document.getElementById("monthlyPurchase").innerText = monthlyPurchase.toFixed(2);
+
+        const monthlyExpense = expenseData.filter(r => r[0] >= monthStart && r[0] <= today).reduce((sum, r) => sum + (parseFloat(r[3]) || 0), 0);
+        document.getElementById("monthlyExpense").innerText = monthlyExpense.toFixed(2);
+
+        const productionsToday = productionData.filter(r => r[0] === today).reduce((sum, r) => sum + (parseFloat(r[4]) || 0), 0);
+        document.getElementById("productionsToday").innerText = productionsToday.toFixed(2);
+
+        const expenseToday = expenseData.filter(r => r[0] === today).reduce((sum, r) => sum + (parseFloat(r[3]) || 0), 0);
+        document.getElementById("expenseToday").innerText = expenseToday.toFixed(2);
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function fetchSheet(sheetName) {
+      const res = await fetch(SCRIPT_URL + "?sheet=" + sheetName);
+      return await res.json();
+    }
+
+    // Search
+    async function searchRecords() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const resultDiv = document.getElementById("searchResult");
+      resultDiv.innerHTML = "Searching...";
+
+      try {
+        const data = await fetchSheet("Daily Production");
+        let html = "<table><tr><th>Date</th><th>Batch Number</th><th>Product Name</th><th>Actual Qty</th><th>Yield %</th></tr>";
+        let found = false;
+
+        for (let i = 1; i < data.length; i++) {
+          const row = data[i];
+          if ((row[1] && row[1].toString().toLowerCase().includes(query)) || (row[2] && row[2].toString().toLowerCase().includes(query))) {
+            html += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[4]}</td><td>${row[5]}</td></tr>`;
+            found = true;
+          }
+        }
+        html += "</table>";
+        resultDiv.innerHTML = found ? html : "No records found.";
+      } catch (err) {
+        resultDiv.innerHTML = "Error fetching data.";
+      }
+    }
+
+    // Dynamic rows
+    function addRMInRow() {
+      const tbody = document.getElementById("rmInTableBody");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="text" placeholder="Product Name"></td>
+        <td><input type="number" step="0.01" placeholder="Qty"></td>
+        <td><input type="number" step="0.01" placeholder="Rate"></td>
+        <td><input type="number" step="0.01" placeholder="Total" readonly></td>
+        <td><button type="button" class="btn-remove" onclick="this.closest('tr').remove()">Remove</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function addDispatchRow() {
+      const tbody = document.getElementById("dispatchTableBody");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="text" placeholder="Product"></td>
+        <td><input type="text" placeholder="Batch"></td>
+        <td><input type="number" step="0.01" placeholder="Qty"></td>
+        <td><input type="number" step="0.01" placeholder="Rate"></td>
+        <td><input type="number" step="0.01" placeholder="Total" readonly></td>
+        <td><button type="button" class="btn-remove" onclick="this.closest('tr').remove()">Remove</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function addConsumptionRow() {
+      const tbody = document.getElementById("consumptionTableBody");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="text" placeholder="Raw Material"></td>
+        <td><input type="number" step="0.01" placeholder="Qty"></td>
+        <td><input type="text" placeholder="Unit"></td>
+        <td><button type="button" class="btn-remove" onclick="this.closest('tr').remove()">Remove</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    // Basic form submissions
+    document.getElementById("productionForm").onsubmit = async function(e) {
+      e.preventDefault();
+      alert("Production saved!");
+    };
+
+    document.getElementById("rmInForm").onsubmit = async function(e) {
+      e.preventDefault();
+      alert("RM IN saved!");
+    };
+
+    document.getElementById("dispatchForm").onsubmit = async function(e) {
+      e.preventDefault();
+      alert("Dispatch saved!");
+    };
+
+    document.getElementById("salesForm").onsubmit = async function(e) {
+      e.preventDefault();
+      alert("Sales saved!");
+    };
+  </script>
+</body>
+</html>
